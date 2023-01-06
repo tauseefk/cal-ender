@@ -1,0 +1,16 @@
+[package]
+name = "cal-endar"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+thiserror = "1.0.38"
+serde = { version = "1.0.151", features = ["derive"] }
+dioxus = { version = "0.2.4", features = ["web"] }
+petgraph = "0.6.2"
+
+[dependencies.uuid]
+version = "1.2.2"
+features = ["v4", "fast-rng", "js"]
