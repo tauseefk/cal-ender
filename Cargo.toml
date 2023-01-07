@@ -5,6 +5,9 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = ["console_log"]
+
 [dependencies]
 thiserror = "1.0.38"
 serde = { version = "1.0.151", features = ["derive"] }

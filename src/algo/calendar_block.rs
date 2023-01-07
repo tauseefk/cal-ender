@@ -7,6 +7,17 @@ pub enum CalendarBlockType {
     Wrapper,
 }
 
+impl Display for CalendarBlockType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let block_type = match self {
+            CalendarBlockType::Wrapper => "Wrapper",
+            CalendarBlockType::Busy => "Busy",
+            CalendarBlockType::Available => "Available",
+        };
+        write!(f, "{}", block_type)
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CalendarBlock {
     pub id: Uuid,
