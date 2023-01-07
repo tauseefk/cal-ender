@@ -132,15 +132,12 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                 top: *ghost_block_top.get(),
                 left: 0.,
                 height: height,
-                width: 500.,
+                width: MAX_COL_WIDTH,
+                opacity: 100,
                 label: "{d_block.block.start_minute} - {d_block.block.end_minute}",
                 block_type: d_block.block.block_type,
-                stack_position: 4,
-                onmousedown: move |_| {},
-                opacity: 100,
-                onmouseup: move |_| {
-                    dragged_block.set(None);
-                }
+                onmouseup: move |_| { dragged_block.set(None); }
+                onmousemove: handle_ghost_block_drag,
             })
         }
         None => rsx!(empty_element::EmptyElement {}),
@@ -156,7 +153,8 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                         let flattened_block = flattened_block.clone();
                         let dragged_block_option = dragged_block.get();
 
-                        let opacity = match dragged_block_option.is_some() && (flattened_block.block.id.to_string() == dragged_block_option.unwrap().block.id.to_string()) {
+                        let opacity = match dragged_block_option.is_some() 
+                            && (flattened_block.block.id.to_string() == dragged_block_option.unwrap().block.id.to_string()) {
                             true => 50,
                             false => 100,
                         };
@@ -173,7 +171,6 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                             height: height,
                             label: "{flattened_block.block.start_minute} - {flattened_block.block.end_minute}",
                             block_type: flattened_block.block.block_type,
-                            stack_position: flattened_block.stack_position,
                             opacity: opacity,
                             onmousedown: move |evt: MouseEvent| {
                                 dragged_block.set(Some(flattened_block));

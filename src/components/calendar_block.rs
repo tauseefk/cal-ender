@@ -9,17 +9,15 @@ pub struct CalendarBlockListItemProps<'block> {
     opacity: u8,
     label: &'block str,
     block_type: CalendarBlockType,
-    stack_position: usize,
-    onmousedown: EventHandler<'block, MouseEvent>,
+    onmousedown: Option<EventHandler<'block, MouseEvent>>,
     onmouseup: EventHandler<'block, MouseEvent>,
+    onmousemove: Option<EventHandler<'block, MouseEvent>>,
 }
 
 #[allow(non_snake_case)]
 pub fn CalendarBlockListItem<'block>(
     cx: Scope<'block, CalendarBlockListItemProps<'block>>,
 ) -> Element {
-    let stack_position = cx.props.stack_position;
-
     let block_type_class = match cx.props.block_type {
         CalendarBlockType::Wrapper => "wrapper",
         CalendarBlockType::Busy => "busy",
@@ -33,8 +31,17 @@ pub fn CalendarBlockListItem<'block>(
         height: "{cx.props.height}px",
         width: "{cx.props.width}px",
         opacity: "{cx.props.opacity}%",
-        onmousedown: move |evt| cx.props.onmousedown.call(evt),
+        onmousedown: move |evt| {
+            if let Some(handle_mouse_down) = &cx.props.onmousedown {
+                handle_mouse_down.call(evt);
+            }
+        },
         onmouseup: move |evt| cx.props.onmouseup.call(evt),
+        onmousemove: move |evt| {
+            if let Some(handle_mouse_move) = &cx.props.onmousemove {
+                handle_mouse_move.call(evt);
+            }
+        },
         "{cx.props.label}"
     }));
 }
