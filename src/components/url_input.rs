@@ -19,7 +19,7 @@ pub fn UrlInput(cx: Scope<UrlInputProps>) -> Element {
             message: "Error: The URL you entered is invalid.".to_string(),
             severity: ErrorSeverity::Error
         }),
-        false => rsx!(EmptyElement {}),
+        false => rsx!(empty_element::EmptyElement {}),
     };
 
     cx.render(rsx!(
@@ -69,9 +69,4 @@ fn ErrorMessage(cx: Scope<ErrorMessageProps>) -> Element {
             }
         }
     })
-}
-
-#[allow(non_snake_case)]
-fn EmptyElement(_: Scope) -> Element {
-    None
 }

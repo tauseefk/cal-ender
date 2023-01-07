@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct FlattenedCalendarBlock {
     pub block: CalendarBlock,
     pub stack_position: usize,
