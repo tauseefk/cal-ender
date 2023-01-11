@@ -6,9 +6,23 @@ pub struct FlattenedCalendarBlock {
     pub stack_position: usize,
 }
 
+#[derive(Clone, Copy, PartialEq)]
+pub enum GraphEdgeType {
+    Forward, // towards the root
+    Backward,
+}
+impl Display for GraphEdgeType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            GraphEdgeType::Forward => write!(f, "Forward"),
+            GraphEdgeType::Backward => write!(f, "Backward"),
+        }
+    }
+}
+
 pub struct CalendarTrie {
     root_idx: NodeIndex,
-    adjacency: Graph<Uuid, usize>,
+    adjacency: Graph<Uuid, GraphEdgeType>,
     id_to_block_map: HashMap<Uuid, CalendarBlock>,
 }
 
@@ -45,11 +59,11 @@ impl CalendarTrie {
         let mut overlapping_blocks: Vec<NodeIndex> = vec![];
 
         while keep_going {
-            let mut neighbors = self.adjacency.neighbors(destination);
+            let mut forward_neighbors = self.adjacency.neighbors(destination);
 
             let adjacency_list = &mut self.adjacency.clone();
 
-            match neighbors.next() {
+            match forward_neighbors.next() {
                 Some(n) => {
                     let current_block = adjacency_list[n];
                     let current_block = self.id_to_block_map.get(&current_block).unwrap();
@@ -68,19 +82,30 @@ impl CalendarTrie {
                         }
                         None => {
                             let idx = adjacency_list.add_node(block.id);
-                            adjacency_list.add_edge(destination, idx, 1);
+                            adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
+                            adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
                             keep_going = false;
                         }
                     };
                 }
                 None => {
                     let idx = adjacency_list.add_node(block.id);
-                    adjacency_list.add_edge(destination, idx, 1);
+                    adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
+                    adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
                     if overlapping_blocks.is_empty() {
                     } else {
                         //
                         overlapping_blocks.iter().for_each(|overlapping_block| {
-                            adjacency_list.add_edge(idx, *overlapping_block, 1);
+                            adjacency_list.add_edge(
+                                idx,
+                                *overlapping_block,
+                                GraphEdgeType::Forward,
+                            );
+                            adjacency_list.add_edge(
+                                *overlapping_block,
+                                idx,
+                                GraphEdgeType::Backward,
+                            );
                             match adjacency_list.find_edge(destination, *overlapping_block) {
                                 Some(edge_idx) => {
                                     adjacency_list.remove_edge(edge_idx);
