@@ -145,7 +145,16 @@ impl CalendarTrie {
             let neighbors = self.adjacency.neighbors(node_idx);
 
             neighbors.into_iter().for_each(|n| {
-                traversal_queue.push_back((n, stack_position + 1));
+                // TODO: ensure only forward neighbors are used
+                let edge = self
+                    .adjacency
+                    .edges_connecting(node_idx, n)
+                    .find(|e| *e.weight() == GraphEdgeType::Forward);
+
+                if let Some(_) = edge {
+                    info!("weeeeee");
+                    traversal_queue.push_back((n, stack_position + 1));
+                }
             });
         }
 
