@@ -59,7 +59,17 @@ impl CalendarTrie {
         let mut overlapping_blocks: Vec<NodeIndex> = vec![];
 
         while keep_going {
-            let mut forward_neighbors = self.adjacency.neighbors(destination);
+            let mut forward_neighbors = self.adjacency.neighbors(destination).filter(|n| {
+                let edge = self
+                    .adjacency
+                    .edges_connecting(destination, *n)
+                    .find(|e| *e.weight() == GraphEdgeType::Forward);
+
+                match edge {
+                    Some(_) => true,
+                    None => false,
+                }
+            });
 
             let adjacency_list = &mut self.adjacency.clone();
 
@@ -142,19 +152,20 @@ impl CalendarTrie {
             let (node_idx, stack_position) = traversal_queue.pop_front().unwrap();
             buffer.push((node_idx, stack_position));
 
-            let neighbors = self.adjacency.neighbors(node_idx);
-
-            neighbors.into_iter().for_each(|n| {
-                // TODO: ensure only forward neighbors are used
+            let forward_neighbors = self.adjacency.neighbors(node_idx).filter(|n| {
                 let edge = self
                     .adjacency
-                    .edges_connecting(node_idx, n)
+                    .edges_connecting(node_idx, *n)
                     .find(|e| *e.weight() == GraphEdgeType::Forward);
 
-                if let Some(_) = edge {
-                    info!("weeeeee");
-                    traversal_queue.push_back((n, stack_position + 1));
+                match edge {
+                    Some(_) => true,
+                    None => false,
                 }
+            });
+
+            forward_neighbors.into_iter().for_each(|n| {
+                traversal_queue.push_back((n, stack_position + 1));
             });
         }
 
