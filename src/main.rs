@@ -54,24 +54,28 @@ fn app(cx: Scope) -> Element {
                 start_minute: 750,
                 end_minute: 1050,
                 block_type: CalendarBlockType::Available,
+                subtree_depth: 0,
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
                 start_minute: 780,
                 end_minute: 915,
                 block_type: CalendarBlockType::Busy,
+                subtree_depth: 0,
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
                 start_minute: 780,
                 end_minute: 900,
                 block_type: CalendarBlockType::Busy,
+                subtree_depth: 0,
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
                 start_minute: 780,
                 end_minute: 825,
                 block_type: CalendarBlockType::Busy,
+                subtree_depth: 0,
             },
         ];
 
@@ -87,11 +91,6 @@ fn app(cx: Scope) -> Element {
 
         return calendar_blocks;
     });
-
-    // TODO:
-    // pass the &UseState<Vec<CalendarBlock>> to the calendar,
-    // populate the trie and Vec<FlattenedCalendarBlock> from the &UseState<Vec<CalendarBlock>>,
-    // handle_update_calendar_blocks should update the Vec<CalendarBlock> itself
 
     cx.render(rsx! {
         calendar::Calendar {

@@ -45,6 +45,7 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                 return CalendarBlock {
                     id: block.id,
                     block_type: block.block_type,
+                    subtree_depth: block.subtree_depth,
                     end_minute,
                     start_minute,
                 };

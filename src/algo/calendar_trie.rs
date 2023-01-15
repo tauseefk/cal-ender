@@ -4,6 +4,7 @@ use crate::prelude::*;
 pub struct FlattenedCalendarBlock {
     pub block: CalendarBlock,
     pub stack_position: usize,
+    pub subtree_depth: usize,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -35,6 +36,7 @@ impl CalendarTrie {
             start_minute: 0,
             end_minute: 1440,
             block_type: CalendarBlockType::Wrapper,
+            subtree_depth: 0,
         };
 
         id_to_block_map.insert(root_node.id, root_node);
@@ -94,6 +96,7 @@ impl CalendarTrie {
                             let idx = adjacency_list.add_node(block.id);
                             adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
                             adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
+
                             keep_going = false;
                         }
                     };
@@ -102,6 +105,7 @@ impl CalendarTrie {
                     let idx = adjacency_list.add_node(block.id);
                     adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
                     adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
+
                     if overlapping_blocks.is_empty() {
                     } else {
                         //
@@ -131,8 +135,47 @@ impl CalendarTrie {
             self.adjacency = adjacency_list.clone();
         }
 
+        self.update_subtree_depth_until_root(destination, 1);
         self.id_to_block_map.insert(block.id, block);
         Ok(())
+    }
+
+    fn update_subtree_depth_until_root(&mut self, node_idx: NodeIndex, value: usize) {
+        let node_id = self.adjacency[node_idx];
+        let node = self.id_to_block_map.get(&node_id);
+
+        if let Some(node) = node {
+            if node.subtree_depth >= value {
+                return;
+            }
+
+            self.id_to_block_map.insert(
+                node_id,
+                CalendarBlock {
+                    id: node_id,
+                    end_minute: node.end_minute,
+                    start_minute: node.start_minute,
+                    block_type: node.block_type,
+                    subtree_depth: value,
+                },
+            );
+
+            let mut parent = self.adjacency.neighbors(node_idx).filter(|_| {
+                let edge = self
+                    .adjacency
+                    .edges(node_idx)
+                    .find(|e| *e.weight() == GraphEdgeType::Backward);
+
+                match edge {
+                    Some(_) => true,
+                    None => false,
+                }
+            });
+
+            if let Some(p) = parent.next() {
+                self.update_subtree_depth_until_root(p, value + 1);
+            }
+        }
     }
 
     pub fn display(&self) {
@@ -177,6 +220,7 @@ impl CalendarTrie {
                 return FlattenedCalendarBlock {
                     block: *current_block,
                     stack_position: *stack_position,
+                    subtree_depth: 1,
                 };
             })
             .collect()
