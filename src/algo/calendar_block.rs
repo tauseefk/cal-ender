@@ -24,6 +24,7 @@ pub struct CalendarBlock {
     pub start_minute: u32,
     pub end_minute: u32, // exclusive
     pub block_type: CalendarBlockType,
+    pub subtree_depth: usize,
 }
 
 #[derive(Debug)]

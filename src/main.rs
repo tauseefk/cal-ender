@@ -34,7 +34,7 @@ use prelude::*;
 cfg_block! {
     if #[cfg(feature = "console_log")] {
         fn init_log() {
-            console_log::init_with_level(Level::Trace).expect("error initializing log");
+            console_log::init_with_level(Level::Info).expect("error initializing log");
         }
     } else {
         fn init_log() {}
@@ -51,27 +51,38 @@ fn app(cx: Scope) -> Element {
         let mut calendar_blocks = vec![
             CalendarBlock {
                 id: Uuid::new_v4(),
-                start_minute: 750,
-                end_minute: 1050,
+                start_minute: 750 - 420,
+                end_minute: 1050 - 420,
                 block_type: CalendarBlockType::Available,
+                subtree_depth: 0,
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
-                start_minute: 780,
-                end_minute: 915,
+                start_minute: 780 - 420,
+                end_minute: 915 - 420,
                 block_type: CalendarBlockType::Busy,
+                subtree_depth: 0,
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
-                start_minute: 780,
-                end_minute: 900,
+                start_minute: 780 - 420,
+                end_minute: 825 - 420,
                 block_type: CalendarBlockType::Busy,
+                subtree_depth: 0,
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
-                start_minute: 780,
-                end_minute: 825,
+                start_minute: 820 - 420,
+                end_minute: 850 - 420,
                 block_type: CalendarBlockType::Busy,
+                subtree_depth: 0,
+            },
+            CalendarBlock {
+                id: Uuid::new_v4(),
+                start_minute: 780 - 420,
+                end_minute: 900 - 420,
+                block_type: CalendarBlockType::Busy,
+                subtree_depth: 0,
             },
         ];
 
@@ -88,14 +99,17 @@ fn app(cx: Scope) -> Element {
         return calendar_blocks;
     });
 
-    // TODO:
-    // pass the &UseState<Vec<CalendarBlock>> to the calendar,
-    // populate the trie and Vec<FlattenedCalendarBlock> from the &UseState<Vec<CalendarBlock>>,
-    // handle_update_calendar_blocks should update the Vec<CalendarBlock> itself
-
     cx.render(rsx! {
-        calendar::Calendar {
-            calendar_blocks: calendar_blocks,
+        div {
+            class: "App",
+            rsx!(
+                div {
+                    class: "flex flex-row",
+                    rsx!(calendar::Calendar {
+                        calendar_blocks: calendar_blocks,
+                    })
+                })
         }
+
     })
 }
