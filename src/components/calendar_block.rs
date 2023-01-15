@@ -27,9 +27,9 @@ pub fn CalendarBlockListItem<'block>(
     return cx.render(rsx!(div {
         class: "absolute calendar-block {block_type_class}",
         top: "{cx.props.top}px",
-        left: "{cx.props.left}px",
+        left: "calc(100% * {cx.props.left})",
         height: "{cx.props.height}px",
-        width: "{cx.props.width}px",
+        width: "calc(100% * {cx.props.width})",
         opacity: "{cx.props.opacity}%",
         onmousedown: move |evt| {
             if let Some(handle_mouse_down) = &cx.props.onmousedown {
