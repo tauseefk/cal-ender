@@ -34,7 +34,7 @@ use prelude::*;
 cfg_block! {
     if #[cfg(feature = "console_log")] {
         fn init_log() {
-            console_log::init_with_level(Level::Trace).expect("error initializing log");
+            console_log::init_with_level(Level::Info).expect("error initializing log");
         }
     } else {
         fn init_log() {}
@@ -66,14 +66,21 @@ fn app(cx: Scope) -> Element {
             CalendarBlock {
                 id: Uuid::new_v4(),
                 start_minute: 780,
-                end_minute: 900,
+                end_minute: 825,
+                block_type: CalendarBlockType::Busy,
+                subtree_depth: 0,
+            },
+            CalendarBlock {
+                id: Uuid::new_v4(),
+                start_minute: 820,
+                end_minute: 850,
                 block_type: CalendarBlockType::Busy,
                 subtree_depth: 0,
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
                 start_minute: 780,
-                end_minute: 825,
+                end_minute: 900,
                 block_type: CalendarBlockType::Busy,
                 subtree_depth: 0,
             },

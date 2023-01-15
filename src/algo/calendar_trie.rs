@@ -4,10 +4,9 @@ use crate::prelude::*;
 pub struct FlattenedCalendarBlock {
     pub block: CalendarBlock,
     pub stack_position: usize,
-    pub subtree_depth: usize,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum GraphEdgeType {
     Forward, // towards the root
     Backward,
@@ -106,9 +105,7 @@ impl CalendarTrie {
                     adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
                     adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
 
-                    if overlapping_blocks.is_empty() {
-                    } else {
-                        //
+                    if !overlapping_blocks.is_empty() {
                         overlapping_blocks.iter().for_each(|overlapping_block| {
                             adjacency_list.add_edge(
                                 idx,
@@ -141,45 +138,34 @@ impl CalendarTrie {
     }
 
     fn update_subtree_depth_until_root(&mut self, node_idx: NodeIndex, value: usize) {
+        // info!("update subtree depth start: {:?} {}", node_idx, value);
         let node_id = self.adjacency[node_idx];
-        let node = self.id_to_block_map.get(&node_id);
+        let maybe_node = self.id_to_block_map.get_mut(&node_id);
 
-        if let Some(node) = node {
-            if node.subtree_depth >= value {
-                return;
-            }
+        if let Some(node) = maybe_node {
+            if node.subtree_depth < value {
+                node.subtree_depth = value;
 
-            self.id_to_block_map.insert(
-                node_id,
-                CalendarBlock {
-                    id: node_id,
-                    end_minute: node.end_minute,
-                    start_minute: node.start_minute,
-                    block_type: node.block_type,
-                    subtree_depth: value,
-                },
-            );
+                let mut parent = self.adjacency.neighbors(node_idx).filter(|n| {
+                    let edge = self
+                        .adjacency
+                        .edges_connecting(node_idx, *n)
+                        .find(|e| *e.weight() == GraphEdgeType::Backward);
 
-            let mut parent = self.adjacency.neighbors(node_idx).filter(|_| {
-                let edge = self
-                    .adjacency
-                    .edges(node_idx)
-                    .find(|e| *e.weight() == GraphEdgeType::Backward);
-
-                match edge {
-                    Some(_) => true,
-                    None => false,
+                    match edge {
+                        Some(_) => true,
+                        None => false,
+                    }
+                });
+                if let Some(p) = parent.next() {
+                    self.update_subtree_depth_until_root(p, value + 1);
                 }
-            });
-
-            if let Some(p) = parent.next() {
-                self.update_subtree_depth_until_root(p, value + 1);
             }
         }
     }
 
     pub fn display(&self) {
-        println!("{}", Dot::new(&self.adjacency));
+        info!("{}", Dot::new(&self.adjacency));
     }
 
     pub fn traverse(&self) -> Vec<FlattenedCalendarBlock> {
@@ -220,7 +206,6 @@ impl CalendarTrie {
                 return FlattenedCalendarBlock {
                     block: *current_block,
                     stack_position: *stack_position,
-                    subtree_depth: 1,
                 };
             })
             .collect()

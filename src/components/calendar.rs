@@ -24,8 +24,8 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
         let _ = calendar_trie.add(*block, None);
     });
 
+    calendar_trie.display();
     let flattened_blocks = calendar_trie.traverse();
-
     let handle_ghost_block_drag = move |evt: MouseEvent| {
         if let Some(_) = dragged_block.get() {
             let position_y = evt.client_y as f64;
@@ -105,7 +105,10 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                         let top = flattened_block.block.start_minute as f64;
                         let height = (flattened_block.block.end_minute - flattened_block.block.start_minute) as f64;
 
-                        let label = format!("{}, {}", flattened_block.block.block_type, get_time_from_minutes(flattened_block.block.start_minute));
+                        let label = format!("{}, {}, SD: {}",
+                            flattened_block.block.block_type,
+                            get_time_from_minutes(flattened_block.block.start_minute),
+                            flattened_block.block.subtree_depth);
 
                         return rsx!(calendar_block::CalendarBlockListItem {
                             key: "{flattened_block.block.id}",
