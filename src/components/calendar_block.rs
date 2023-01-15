@@ -2,10 +2,10 @@ use crate::prelude::*;
 
 #[derive(Props)]
 pub struct CalendarBlockListItemProps<'block> {
-    top: f64,
-    left: f64,
-    width: f64,
-    height: f64,
+    top: String,
+    left: String,
+    width: String,
+    height: String,
     opacity: u8,
     label: &'block str,
     block_type: CalendarBlockType,
@@ -26,10 +26,10 @@ pub fn CalendarBlockListItem<'block>(
 
     return cx.render(rsx!(div {
         class: "absolute calendar-block {block_type_class}",
-        top: "{cx.props.top}px",
-        left: "calc(100% * {cx.props.left})",
-        height: "{cx.props.height}px",
-        width: "calc(100% * {cx.props.width})",
+        top: "{cx.props.top}",
+        left: "{cx.props.left}",
+        height: "{cx.props.height}",
+        width: "{cx.props.width}",
         opacity: "{cx.props.opacity}%",
         onmousedown: move |evt| {
             if let Some(handle_mouse_down) = &cx.props.onmousedown {

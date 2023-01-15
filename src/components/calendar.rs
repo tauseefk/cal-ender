@@ -18,6 +18,7 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
     let ghost_block_top = use_state(&cx, || 0_f64);
     let click_offset = use_state(&cx, || 0_f64);
     let dragged_block = use_state(&cx, || None::<FlattenedCalendarBlock>);
+    let use_g_stacking_algorithm = use_state(&cx, || false);
 
     let mut calendar_trie = CalendarTrie::new();
     cx.props.calendar_blocks.get().iter().for_each(|block| {
@@ -71,10 +72,10 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
             let label = format!("{}, {}", d_block.block.block_type, get_time_from_minutes(d_block.block.start_minute));
 
             rsx!(calendar_block::CalendarBlockListItem {
-                top: *ghost_block_top.get(),
-                left: 0.,
-                height: height,
-                width: MAX_COL_WIDTH,
+                top: format!("{}px", *ghost_block_top.get()),
+                left: format!("{}px", 0),
+                height: format!("{}px", height),
+                width: format!("{}px", MAX_COL_WIDTH),
                 opacity: 100,
                 label: "{label}",
                 block_type: d_block.block.block_type,
@@ -85,6 +86,13 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
         None => rsx!(empty_element::EmptyElement {}),
     };
     return cx.render(rsx! {
+        button {
+            class: "btn",
+            onclick: move |_| {
+                use_g_stacking_algorithm.set(!use_g_stacking_algorithm.get());
+            },
+            "Switch Stacking Algorithm"
+        }
         div {
             class: "calendar-container",
             div {
@@ -101,14 +109,16 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                             false => 100,
                         };
 
-                        let (left, width) = get_position_offsets(flattened_block.stack_position);
-                        let top = flattened_block.block.start_minute as f64;
-                        let height = (flattened_block.block.end_minute - flattened_block.block.start_minute) as f64;
+                        let (left, width) = match use_g_stacking_algorithm.get() {
+                            true => get_g_transforms(flattened_block.stack_position, flattened_block.block.subtree_depth),
+                            false => get_position_offsets(flattened_block.stack_position)
+                        };
+                        let top = format!("{}px", flattened_block.block.start_minute);
+                        let height = format!("{}px", flattened_block.block.end_minute - flattened_block.block.start_minute);
 
-                        let label = format!("{}, {}, SD: {}",
+                        let label = format!("{}, {}",
                             flattened_block.block.block_type,
-                            get_time_from_minutes(flattened_block.block.start_minute),
-                            flattened_block.block.subtree_depth);
+                            get_time_from_minutes(flattened_block.block.start_minute));
 
                         return rsx!(calendar_block::CalendarBlockListItem {
                             key: "{flattened_block.block.id}",
