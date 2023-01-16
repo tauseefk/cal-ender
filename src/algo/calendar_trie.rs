@@ -152,10 +152,7 @@ impl CalendarTrie {
                         .edges_connecting(node_idx, *n)
                         .find(|e| *e.weight() == GraphEdgeType::Backward);
 
-                    match edge {
-                        Some(_) => true,
-                        None => false,
-                    }
+                    edge.is_some()
                 });
                 if let Some(p) = parent.next() {
                     self.update_subtree_depth_until_root(p, value + 1);
