@@ -49,91 +49,62 @@ impl CalendarTrie {
             id_to_block_map,
         }
     }
+
     pub fn add(
         &mut self,
         block: CalendarBlock,
         destination: Option<NodeIndex>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let mut destination = destination.unwrap_or(self.root_idx);
+        // TODO: Recursive Add
+        // 1. find overlaps
+        //      if no overlap
+        //          add edge from destination to new block
+        //          return
+        //      else if new block gets swallowed
+        //          call add with new destination
+        //      else
+        //          TBD:
 
-        let mut keep_going = true;
-        let mut overlapping_blocks: Vec<NodeIndex> = vec![];
+        let destination = destination.unwrap_or(self.root_idx);
 
-        while keep_going {
-            let mut forward_neighbors = self.adjacency.neighbors(destination).filter(|n| {
+        let mut forward_neighbors = self
+            .adjacency
+            .neighbors(destination)
+            .filter(|neighbor_idx| {
                 let edge = self
                     .adjacency
-                    .edges_connecting(destination, *n)
+                    .edges_connecting(destination, *neighbor_idx)
                     .find(|e| *e.weight() == GraphEdgeType::Forward);
 
-                match edge {
-                    Some(_) => true,
-                    None => false,
-                }
+                edge.is_some()
             });
 
-            let adjacency_list = &mut self.adjacency.clone();
+        let adjacency_list = &mut self.adjacency.clone();
 
-            match forward_neighbors.next() {
-                Some(n) => {
-                    let current_block = adjacency_list[n];
-                    let current_block = self.id_to_block_map.get(&current_block).unwrap();
+        let overlap = forward_neighbors.find_map(|forward_n_idx| {
+            let current_block = adjacency_list[forward_n_idx];
+            let current_block = self.id_to_block_map.get(&current_block).unwrap();
 
-                    match block.does_overlap(*current_block) {
-                        Some(o) => {
-                            match o {
-                                CalendarBlockOverlap::Swallows => {
-                                    overlapping_blocks.push(n);
-                                }
-                                CalendarBlockOverlap::GetsSwallowed => {
-                                    destination = n;
-                                    overlapping_blocks = vec![];
-                                }
-                            };
-                        }
-                        None => {
-                            let idx = adjacency_list.add_node(block.id);
-                            adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
-                            adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
+            match block.does_overlap(*current_block) {
+                Some(o) => Some((o, forward_n_idx)),
+                None => None,
+            }
+        });
 
-                            keep_going = false;
-                        }
-                    };
-                }
-                None => {
-                    let idx = adjacency_list.add_node(block.id);
-                    adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
-                    adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
+        let _ = match overlap {
+            Some((_, node_idx)) => self.add(block, Some(node_idx)),
+            None => {
+                let idx = adjacency_list.add_node(block.id);
+                adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
+                adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
+                self.adjacency = adjacency_list.clone();
 
-                    if !overlapping_blocks.is_empty() {
-                        overlapping_blocks.iter().for_each(|overlapping_block| {
-                            adjacency_list.add_edge(
-                                idx,
-                                *overlapping_block,
-                                GraphEdgeType::Forward,
-                            );
-                            adjacency_list.add_edge(
-                                *overlapping_block,
-                                idx,
-                                GraphEdgeType::Backward,
-                            );
-                            match adjacency_list.find_edge(destination, *overlapping_block) {
-                                Some(edge_idx) => {
-                                    adjacency_list.remove_edge(edge_idx);
-                                }
-                                None => {}
-                            }
-                        });
-                    }
-                    keep_going = false;
-                }
-            };
+                self.update_subtree_depth_until_root(destination, 1);
+                self.id_to_block_map.insert(block.id, block);
+                Ok(())
+            }
+        };
 
-            self.adjacency = adjacency_list.clone();
-        }
-
-        self.update_subtree_depth_until_root(destination, 1);
-        self.id_to_block_map.insert(block.id, block);
         Ok(())
     }
 
