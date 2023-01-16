@@ -67,7 +67,7 @@ impl CalendarTrie {
 
         let destination = destination.unwrap_or(self.root_idx);
 
-        let mut forward_neighbors = self
+        let forward_neighbors = self
             .adjacency
             .neighbors(destination)
             .filter(|neighbor_idx| {
@@ -81,19 +81,64 @@ impl CalendarTrie {
 
         let adjacency_list = &mut self.adjacency.clone();
 
-        let overlap = forward_neighbors.find_map(|forward_n_idx| {
-            let current_block = adjacency_list[forward_n_idx];
-            let current_block = self.id_to_block_map.get(&current_block).unwrap();
+        let overlap: (Option<CalendarBlockOverlap>, Vec<NodeIndex>) =
+            forward_neighbors.fold((None, vec![]), |acc, forward_n_idx| {
+                let current_block = adjacency_list[forward_n_idx];
+                let current_block = self.id_to_block_map.get(&current_block).unwrap();
 
-            match block.does_overlap(*current_block) {
-                Some(o) => Some((o, forward_n_idx)),
-                None => None,
+                match block.does_overlap(*current_block) {
+                    Some(o) => Some((o, forward_n_idx)),
+                    None => None,
+                };
+
+                let (overlap_so_far, overlapping_blocks) = acc;
+
+                match (overlap_so_far, block.does_overlap(*current_block)) {
+                    (Some(CalendarBlockOverlap::GetsSwallowed), _) => (
+                        Some(CalendarBlockOverlap::GetsSwallowed),
+                        vec![forward_n_idx],
+                    ),
+                    (Some(CalendarBlockOverlap::Swallows), Some(_)) => (
+                        Some(CalendarBlockOverlap::Swallows),
+                        [overlapping_blocks, vec![forward_n_idx]].concat(),
+                    ),
+                    (None, Some(o)) => (Some(o), vec![forward_n_idx]),
+                    (Some(CalendarBlockOverlap::Swallows), None) => {
+                        (Some(CalendarBlockOverlap::Swallows), overlapping_blocks)
+                    }
+                    (None, None) => (None, vec![]),
+                }
+            });
+
+        match overlap {
+            (Some(CalendarBlockOverlap::GetsSwallowed), overlap_node_indices) => {
+                self.add(block, Some(overlap_node_indices[0]))
             }
-        });
+            (Some(CalendarBlockOverlap::Swallows), overlap_node_indices) => {
+                let idx = adjacency_list.add_node(block.id);
 
-        let _ = match overlap {
-            Some((_, node_idx)) => self.add(block, Some(node_idx)),
-            None => {
+                adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
+                adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
+
+                overlap_node_indices.iter().for_each(|overlap_node_idx| {
+                    adjacency_list.add_edge(idx, *overlap_node_idx, GraphEdgeType::Forward);
+                    adjacency_list.add_edge(*overlap_node_idx, idx, GraphEdgeType::Backward);
+
+                    let ad_clone = adjacency_list.clone();
+                    let edges = ad_clone.edges_connecting(destination, *overlap_node_idx);
+
+                    edges.for_each(|connected_edge| {
+                        adjacency_list.remove_edge(connected_edge.id());
+                    });
+                });
+
+                self.adjacency = adjacency_list.clone();
+                self.update_subtree_depth_until_root(destination, 1);
+                self.id_to_block_map.insert(block.id, block);
+
+                Ok(())
+            }
+            (None, _) => {
                 let idx = adjacency_list.add_node(block.id);
                 adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
                 adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
@@ -103,9 +148,20 @@ impl CalendarTrie {
                 self.id_to_block_map.insert(block.id, block);
                 Ok(())
             }
-        };
-
-        Ok(())
+        }
+        // let _ = match overlap {
+        //     Some((_, node_idx)) => self.add(block, Some(node_idx)),
+        //     None => {
+        //         let idx = adjacency_list.add_node(block.id);
+        //         adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
+        //         adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
+        //         self.adjacency = adjacency_list.clone();
+        //
+        //         self.update_subtree_depth_until_root(destination, 1);
+        //         self.id_to_block_map.insert(block.id, block);
+        //         Ok(())
+        //     }
+        // };
     }
 
     fn update_subtree_depth_until_root(&mut self, node_idx: NodeIndex, value: usize) {

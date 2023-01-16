@@ -15,6 +15,7 @@ mod prelude {
     pub use log::{info, Level};
     pub use petgraph::dot::Dot;
     pub use petgraph::graph::{Graph, NodeIndex};
+    pub use petgraph::visit::EdgeRef;
     pub use serde::Deserialize;
     pub use thiserror::Error;
     pub use uuid::Uuid;
