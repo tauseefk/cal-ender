@@ -12,7 +12,6 @@ mod prelude {
     pub use core::fmt;
     pub use dioxus::events::MouseEvent;
     pub use dioxus::prelude::*;
-
     pub use log::{info, Level};
     pub use petgraph::dot::Dot;
     pub use petgraph::graph::{Graph, NodeIndex};

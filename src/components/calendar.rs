@@ -116,9 +116,10 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                         let top = format!("{}px", flattened_block.block.start_minute);
                         let height = format!("{}px", flattened_block.block.end_minute - flattened_block.block.start_minute);
 
-                        let label = format!("{}, {}",
+                        let label = format!("{}, {}, SD: {}",
                             flattened_block.block.block_type,
-                            get_time_from_minutes(flattened_block.block.start_minute));
+                            get_time_from_minutes(flattened_block.block.start_minute),
+                            flattened_block.block.subtree_depth);
 
                         return rsx!(calendar_block::CalendarBlockListItem {
                             key: "{flattened_block.block.id}",
