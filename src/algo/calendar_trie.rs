@@ -8,8 +8,8 @@ pub struct FlattenedCalendarBlock {
 
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum GraphEdgeType {
-    Forward, // towards the root
-    Backward,
+    Forward,
+    Backward, // towards the root
 }
 impl Display for GraphEdgeType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -63,7 +63,9 @@ impl CalendarTrie {
         //      else if new block gets swallowed
         //          call add with new destination
         //      else
-        //          TBD:
+        //          add edge from destination to new block
+        //          add edges from new block to overlapping blocks
+        //          remove edges from destination to overlapping blocks
 
         let destination = destination.unwrap_or(self.root_idx);
 
