@@ -6,23 +6,9 @@ pub struct FlattenedCalendarBlock {
     pub stack_position: usize,
 }
 
-#[derive(Clone, Copy, PartialEq, Debug)]
-pub enum GraphEdgeType {
-    Forward,
-    Backward, // towards the root
-}
-impl Display for GraphEdgeType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            GraphEdgeType::Forward => write!(f, "Forward"),
-            GraphEdgeType::Backward => write!(f, "Backward"),
-        }
-    }
-}
-
 pub struct CalendarTrie {
     root_idx: NodeIndex,
-    adjacency: Graph<Uuid, GraphEdgeType>,
+    adjacency: Graph<Uuid, usize>,
     id_to_block_map: HashMap<Uuid, CalendarBlock>,
 }
 
@@ -55,14 +41,14 @@ impl CalendarTrie {
         block: CalendarBlock,
         destination: Option<NodeIndex>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        // TODO: Recursive Add
+        // Recursive Add
         // 1. find overlaps
         //      if no overlap
         //          add edge from destination to new block
         //          return
         //      else if new block gets swallowed
         //          call add with new destination
-        //      else
+        // TODO:else
         //          add edge from destination to new block
         //          add edges from new block to overlapping blocks
         //          remove edges from destination to overlapping blocks
@@ -71,15 +57,8 @@ impl CalendarTrie {
 
         let mut forward_neighbors = self
             .adjacency
-            .neighbors(destination)
-            .filter(|neighbor_idx| {
-                let edge = self
-                    .adjacency
-                    .edges_connecting(destination, *neighbor_idx)
-                    .find(|e| *e.weight() == GraphEdgeType::Forward);
-
-                edge.is_some()
-            });
+            .edges_directed(destination, petgraph::Direction::Outgoing)
+            .map(|e| e.target());
 
         let adjacency_list = &mut self.adjacency.clone();
 
@@ -97,8 +76,7 @@ impl CalendarTrie {
             Some((_, node_idx)) => self.add(block, Some(node_idx)),
             None => {
                 let idx = adjacency_list.add_node(block.id);
-                adjacency_list.add_edge(destination, idx, GraphEdgeType::Forward);
-                adjacency_list.add_edge(idx, destination, GraphEdgeType::Backward);
+                adjacency_list.add_edge(destination, idx, 1);
                 self.adjacency = adjacency_list.clone();
 
                 self.update_subtree_depth_until_root(destination, 1);
@@ -111,7 +89,6 @@ impl CalendarTrie {
     }
 
     fn update_subtree_depth_until_root(&mut self, node_idx: NodeIndex, value: usize) {
-        // info!("update subtree depth start: {:?} {}", node_idx, value);
         let node_id = self.adjacency[node_idx];
         let maybe_node = self.id_to_block_map.get_mut(&node_id);
 
@@ -119,14 +96,10 @@ impl CalendarTrie {
             if node.subtree_depth < value {
                 node.subtree_depth = value;
 
-                let mut parent = self.adjacency.neighbors(node_idx).filter(|n| {
-                    let edge = self
-                        .adjacency
-                        .edges_connecting(node_idx, *n)
-                        .find(|e| *e.weight() == GraphEdgeType::Backward);
-
-                    edge.is_some()
-                });
+                let mut parent = self
+                    .adjacency
+                    .edges_directed(node_idx, petgraph::Direction::Incoming)
+                    .map(|e| e.source());
                 if let Some(p) = parent.next() {
                     self.update_subtree_depth_until_root(p, value + 1);
                 }
@@ -151,19 +124,12 @@ impl CalendarTrie {
             let (node_idx, stack_position) = traversal_queue.pop_front().unwrap();
             buffer.push((node_idx, stack_position));
 
-            let forward_neighbors = self.adjacency.neighbors(node_idx).filter(|n| {
-                let edge = self
-                    .adjacency
-                    .edges_connecting(node_idx, *n)
-                    .find(|e| *e.weight() == GraphEdgeType::Forward);
+            let forward_neighbors = self
+                .adjacency
+                .edges_directed(node_idx, petgraph::Direction::Outgoing)
+                .map(|e| e.target());
 
-                match edge {
-                    Some(_) => true,
-                    None => false,
-                }
-            });
-
-            forward_neighbors.into_iter().for_each(|n| {
+            forward_neighbors.for_each(|n| {
                 traversal_queue.push_back((n, stack_position + 1));
             });
         }
