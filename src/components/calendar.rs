@@ -37,20 +37,32 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
 
     let handle_move_calendar_block = move |_| {
         if let Some(dragged_block_value) = dragged_block.get() {
-            let mut updated_blocks: Vec<CalendarBlock> = cx.props.calendar_blocks.get().iter().map(|block| {
-                let offset = *ghost_block_top.get() as u32;
-                let (start_minute, end_minute) = match block.id == dragged_block_value.block.id {
-                    true => (offset, dragged_block_value.block.end_minute - dragged_block_value.block.start_minute + offset),
-                    false => (block.start_minute, block.end_minute),
-                };
-                return CalendarBlock {
-                    id: block.id,
-                    block_type: block.block_type,
-                    subtree_depth: block.subtree_depth,
-                    end_minute,
-                    start_minute,
-                };
-            }).collect();
+            let mut updated_blocks: Vec<CalendarBlock> = cx
+                .props
+                .calendar_blocks
+                .get()
+                .iter()
+                .map(|block| {
+                    let offset = *ghost_block_top.get() as u32;
+                    let (start_minute, end_minute) = match block.id == dragged_block_value.block.id
+                    {
+                        true => (
+                            offset,
+                            dragged_block_value.block.end_minute
+                                - dragged_block_value.block.start_minute
+                                + offset,
+                        ),
+                        false => (block.start_minute, block.end_minute),
+                    };
+                    return CalendarBlock {
+                        id: block.id,
+                        block_type: block.block_type,
+                        subtree_depth: block.subtree_depth,
+                        end_minute,
+                        start_minute,
+                    };
+                })
+                .collect();
             updated_blocks.sort_by(|a, b| {
                 if a.start_minute < b.start_minute
                     || a.start_minute == b.start_minute && a.end_minute >= b.end_minute
@@ -63,13 +75,16 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
             cx.props.calendar_blocks.set(updated_blocks);
             dragged_block.set(None);
         };
-        
     };
 
     let ghost_block = match dragged_block.get() {
         Some(d_block) => {
             let height = (d_block.block.end_minute - d_block.block.start_minute) as f64;
-            let label = format!("{}, {}", d_block.block.block_type, get_time_from_minutes(d_block.block.start_minute));
+            let label = format!(
+                "{}, {}",
+                d_block.block.block_type,
+                get_time_from_minutes(d_block.block.start_minute)
+            );
 
             rsx!(calendar_block::CalendarBlockListItem {
                 top: format!("{}px", *ghost_block_top.get()),
@@ -103,7 +118,7 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                         let flattened_block = flattened_block.clone();
                         let dragged_block_option = dragged_block.get();
 
-                        let opacity = match dragged_block_option.is_some() 
+                        let opacity = match dragged_block_option.is_some()
                             && (flattened_block.block.id.to_string() == dragged_block_option.unwrap().block.id.to_string()) {
                             true => 50,
                             false => 100,
@@ -135,7 +150,7 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                                 ghost_block_top.set(flattened_block.block.start_minute as f64);
                                 click_offset.set(evt.client_y  as f64 - flattened_block.block.start_minute as f64);
                             },
-                            onmouseup: handle_move_calendar_block, 
+                            onmouseup: handle_move_calendar_block,
                         });
                     }
                 )
