@@ -28,7 +28,7 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
     calendar_trie.display();
     let flattened_blocks = calendar_trie.traverse();
     let handle_ghost_block_drag = move |evt: MouseEvent| {
-        if let Some(_) = dragged_block.get() {
+        if dragged_block.get().is_some() {
             let position_y = evt.client_y as f64;
             let destination_pos = ((position_y - click_offset.get()) / 15.).floor() * 15.;
             ghost_block_top.set(destination_pos);
@@ -54,13 +54,13 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                         ),
                         false => (block.start_minute, block.end_minute),
                     };
-                    return CalendarBlock {
+                    CalendarBlock {
                         id: block.id,
                         block_type: block.block_type,
                         subtree_depth: block.subtree_depth,
                         end_minute,
                         start_minute,
-                    };
+                    }
                 })
                 .collect();
             updated_blocks.sort_by(|a, b| {
@@ -115,7 +115,7 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                 onmousemove: handle_ghost_block_drag,
                 flattened_blocks.iter().map(move |flattened_block|
                     {
-                        let flattened_block = flattened_block.clone();
+                        let flattened_block = *flattened_block;
                         let dragged_block_option = dragged_block.get();
 
                         let opacity = match dragged_block_option.is_some()

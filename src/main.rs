@@ -22,7 +22,7 @@ mod prelude {
 
     pub use crate::algo::calendar_block::*;
     pub use crate::algo::calendar_trie::*;
-    pub use crate::components::{calendar, calendar_block, empty_element, root, url_input};
+    pub use crate::components::{calendar, calendar_block, empty_element};
     pub use crate::get_position_offsets::*;
 
     pub const MAX_COL_WIDTH: f64 = 500.0;
@@ -96,7 +96,7 @@ fn app(cx: Scope) -> Element {
             }
         });
 
-        return calendar_blocks;
+        calendar_blocks
     });
 
     cx.render(rsx! {

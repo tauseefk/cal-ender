@@ -66,10 +66,9 @@ impl CalendarTrie {
             let current_block = adjacency_list[forward_n_idx];
             let current_block = self.id_to_block_map.get(&current_block).unwrap();
 
-            match block.does_overlap(*current_block) {
-                Some(o) => Some((o, forward_n_idx)),
-                None => None,
-            }
+            block
+                .does_overlap(*current_block)
+                .map(|o| (o, forward_n_idx))
         });
 
         let _ = match overlap {
@@ -139,10 +138,10 @@ impl CalendarTrie {
             .map(|(node_idx, stack_position)| {
                 let current_block_id = self.adjacency[*node_idx];
                 let current_block = self.id_to_block_map.get(&current_block_id).unwrap();
-                return FlattenedCalendarBlock {
+                FlattenedCalendarBlock {
                     block: *current_block,
                     stack_position: *stack_position,
-                };
+                }
             })
             .collect()
     }

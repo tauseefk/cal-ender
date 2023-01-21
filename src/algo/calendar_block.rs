@@ -45,6 +45,6 @@ impl CalendarBlock {
             return Some(CalendarBlockOverlap::GetsSwallowed);
         }
 
-        return Some(CalendarBlockOverlap::Swallows);
+        Some(CalendarBlockOverlap::Swallows)
     }
 }
