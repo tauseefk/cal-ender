@@ -1,5 +1,5 @@
 # cal-endar
-Stacking overlapping calendar events sanely
+Stack overlapping calendar events sanely
 
 <img width="521" alt="Screen Shot 2022-09-22 at 7 59 00 PM" src="https://user-images.githubusercontent.com/11029896/210906906-f87df1ed-c48a-467a-9ae4-4b7ab7e76333.png">
 
