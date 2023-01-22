@@ -48,6 +48,7 @@ fn main() {
 
 fn app(cx: Scope) -> Element {
     let calendar_blocks = use_state(&cx, || {
+
         let mut calendar_blocks = vec![
             CalendarBlock {
                 id: Uuid::new_v4(),
@@ -67,13 +68,6 @@ fn app(cx: Scope) -> Element {
                 id: Uuid::new_v4(),
                 start_minute: 780 - 420,
                 end_minute: 825 - 420,
-                block_type: CalendarBlockType::Busy,
-                subtree_depth: 0,
-            },
-            CalendarBlock {
-                id: Uuid::new_v4(),
-                start_minute: 820 - 420,
-                end_minute: 850 - 420,
                 block_type: CalendarBlockType::Busy,
                 subtree_depth: 0,
             },
