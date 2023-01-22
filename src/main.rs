@@ -48,7 +48,6 @@ fn main() {
 
 fn app(cx: Scope) -> Element {
     let calendar_blocks = use_state(&cx, || {
-
         let mut calendar_blocks = vec![
             CalendarBlock {
                 id: Uuid::new_v4(),
