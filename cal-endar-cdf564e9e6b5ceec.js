@@ -1039,7 +1039,7 @@ function initSync(module) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('cal-endar-b0e7becb1a1c8215_bg.wasm', import.meta.url);
+        input = new URL('cal-endar-cdf564e9e6b5ceec_bg.wasm', import.meta.url);
     }
     const imports = getImports();
 
