@@ -1,8 +1,26 @@
+:root {
+  --color-grayscale-0: #FFFFFF;
+  --color-grayscale-1: #DADBF1;
+  --color-grayscale-2: #494949;
+  --color-grayscale-3: #000000;
+
+  --color-blocks-primary: #FEDF03;
+  --color-blocks-secondary: var(--color-grayscale-0);
+  --color-blocks-accent: #4C5FD5;
+}
+
+body {
+  margin: 0;
+  color: var(--color-grayscale-3);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 .btn {
   width: 100px;
-  height: 100vh;
+  height: 1440px;
   cursor: pointer;
-  border: 1px solid black;
+  border: 1px solid var(--color-grayscale-2);
+  background-color: #fcf9f7;
 }
 
 .flex {
@@ -19,7 +37,6 @@
 
 .calendar-container {
   height: 100vh;
-  overflow-y: scroll;
   display: flex;
   align-items: center;
   position: relative;
@@ -36,14 +53,14 @@
 }
 
 .calendar-block {
-  color: white;
   padding: 4px;
   border-radius: 4px;
-  background-color: #024d91;
+  background-color: var(--color-grayscale-1);
   border: 1px solid white;
   width: 500px;
   box-sizing: border-box;
   text-transform: capitalize;
+  cursor: pointer;
 }
 
 .noselect {
@@ -58,6 +75,7 @@
 
 .wrapper {
   background-color: #fcf9f7;
+  color: transparent;
   pointer-events: none;
 }
 
@@ -66,11 +84,15 @@
 }
 
 .available {
-  background-color: #1cd9b6;
-  color: black;
+  background-color: var(--color-blocks-primary);
+  border: 1px solid;
 }
 
 .busy {
-  background-color: #024d91;
-  color: white;
+  background-color: var(--color-grayscale-0);
+  border: 1px solid var(--color-grayscale-2);
+}
+
+.ghost {
+  box-shadow: 9px 9px 0 0 var(--color-grayscale-2);
 }

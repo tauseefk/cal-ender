@@ -18,7 +18,7 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
     let ghost_block_top = use_state(&cx, || 0_f64);
     let click_offset = use_state(&cx, || 0_f64);
     let dragged_block = use_state(&cx, || None::<FlattenedCalendarBlock>);
-    let use_g_stacking_algorithm = use_state(&cx, || false);
+    let use_g_stacking_algorithm = use_state(&cx, || true);
 
     let mut calendar_trie = CalendarTrie::new();
     cx.props.calendar_blocks.get().iter().for_each(|block| {
@@ -87,6 +87,7 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
             );
 
             rsx!(calendar_block::CalendarBlockListItem {
+                class: "ghost",
                 top: format!("{}px", *ghost_block_top.get()),
                 left: format!("{}px", 0),
                 height: format!("{}px", height),

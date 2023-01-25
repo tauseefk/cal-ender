@@ -2,6 +2,7 @@ use crate::prelude::*;
 
 #[derive(Props)]
 pub struct CalendarBlockListItemProps<'block> {
+    class: Option<&'block str>,
     top: String,
     left: String,
     width: String,
@@ -23,9 +24,13 @@ pub fn CalendarBlockListItem<'block>(
         CalendarBlockType::Busy => "busy",
         CalendarBlockType::Available => "available",
     };
+    let classes = match cx.props.class {
+        Some(c) => c.to_string(),
+        None => "".to_string(),
+    };
 
     return cx.render(rsx!(div {
-        class: "absolute calendar-block {block_type_class}",
+        class: "absolute calendar-block {block_type_class} {classes}",
         top: "{cx.props.top}",
         left: "{cx.props.left}",
         height: "{cx.props.height}",
