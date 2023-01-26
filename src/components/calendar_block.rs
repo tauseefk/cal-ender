@@ -31,6 +31,7 @@ pub fn CalendarBlockListItem<'block>(
 
     return cx.render(rsx!(div {
         class: "absolute calendar-block {block_type_class} {classes}",
+        title: "{cx.props.label}",
         top: "{cx.props.top}",
         left: "{cx.props.left}",
         height: "{cx.props.height}",
