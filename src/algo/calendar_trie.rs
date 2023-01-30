@@ -68,7 +68,7 @@ impl CalendarTrie {
             let current_block = self.id_to_block_map.get(&current_block).unwrap();
 
             block
-                .does_overlap((*current_block).clone())
+                .does_overlap(current_block.clone())
                 .map(|o| (o, forward_n_idx))
         });
 
@@ -140,7 +140,7 @@ impl CalendarTrie {
                 let current_block_id = self.adjacency[*node_idx];
                 let current_block = self.id_to_block_map.get(&current_block_id).unwrap();
                 FlattenedCalendarBlock {
-                    block: (*current_block).clone(),
+                    block: current_block.clone(),
                     stack_position: *stack_position,
                 }
             })

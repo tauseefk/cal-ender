@@ -118,8 +118,7 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                 onmousemove: handle_ghost_block_drag,
                 flattened_blocks.iter().map(move |flattened_block|
                     {
-                        let flattened_block = (*flattened_block).clone();
-                        let flattened_block_2 = flattened_block.clone();
+                        let flattened_block = flattened_block.clone();
                         let dragged_block_option = dragged_block.get();
 
                         let opacity = match dragged_block_option.is_some()
@@ -139,18 +138,19 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
                             flattened_block.block.label,
                             get_time_from_minutes(flattened_block.block.start_minute));
 
+                        let id = flattened_block.block.id;
+                        let block_type = flattened_block.block.block_type;
 
                         return rsx!(calendar_block::CalendarBlockListItem {
-                            key: "{flattened_block.block.id}",
+                            key: "{id}",
                             left: left,
                             top: top,
                             width: width,
                             height: height,
                             label: "{label}",
-                            block_type: flattened_block.block.block_type,
+                            block_type: block_type,
                             opacity: opacity,
                             onmousedown: move |evt: MouseEvent| {
-                                let flattened_block = flattened_block_2.clone();
                                 dragged_block.set(Some(flattened_block.clone()));
                                 ghost_block_top.set(flattened_block.block.start_minute as f64);
                                 click_offset.set(evt.client_y  as f64 - flattened_block.block.start_minute as f64);
