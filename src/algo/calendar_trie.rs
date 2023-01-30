@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct FlattenedCalendarBlock {
     pub block: CalendarBlock,
     pub stack_position: usize,
@@ -22,9 +22,10 @@ impl CalendarTrie {
             end_minute: 1440,
             block_type: CalendarBlockType::Wrapper,
             subtree_depth: 0,
+            label: String::from("Today's Date"),
         };
 
-        id_to_block_map.insert(root_node.id, root_node);
+        id_to_block_map.insert(root_node.id, root_node.clone());
 
         let mut adjacency_map = Graph::new();
         let root = adjacency_map.add_node(root_node.id);
@@ -67,7 +68,7 @@ impl CalendarTrie {
             let current_block = self.id_to_block_map.get(&current_block).unwrap();
 
             block
-                .does_overlap(*current_block)
+                .does_overlap((*current_block).clone())
                 .map(|o| (o, forward_n_idx))
         });
 
@@ -139,7 +140,7 @@ impl CalendarTrie {
                 let current_block_id = self.adjacency[*node_idx];
                 let current_block = self.id_to_block_map.get(&current_block_id).unwrap();
                 FlattenedCalendarBlock {
-                    block: *current_block,
+                    block: (*current_block).clone(),
                     stack_position: *stack_position,
                 }
             })

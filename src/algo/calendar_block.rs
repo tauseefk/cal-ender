@@ -18,13 +18,14 @@ impl Display for CalendarBlockType {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct CalendarBlock {
     pub id: Uuid,
     pub start_minute: u32,
     pub end_minute: u32, // exclusive
     pub block_type: CalendarBlockType,
     pub subtree_depth: usize,
+    pub label: String,
 }
 
 #[derive(Debug)]
