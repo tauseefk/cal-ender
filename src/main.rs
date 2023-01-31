@@ -55,6 +55,7 @@ fn app(cx: Scope) -> Element {
                 end_minute: 1050 - 420,
                 block_type: CalendarBlockType::Available,
                 subtree_depth: 0,
+                label: String::from("Rusted Development"),
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
@@ -62,6 +63,7 @@ fn app(cx: Scope) -> Element {
                 end_minute: 915 - 420,
                 block_type: CalendarBlockType::Busy,
                 subtree_depth: 0,
+                label: String::from("Coffee"),
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
@@ -69,6 +71,7 @@ fn app(cx: Scope) -> Element {
                 end_minute: 825 - 420,
                 block_type: CalendarBlockType::Busy,
                 subtree_depth: 0,
+                label: String::from("Dishes"),
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
@@ -76,6 +79,7 @@ fn app(cx: Scope) -> Element {
                 end_minute: 900 - 420,
                 block_type: CalendarBlockType::Busy,
                 subtree_depth: 0,
+                label: String::from("Shower"),
             },
         ];
 
