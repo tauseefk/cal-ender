@@ -22,7 +22,7 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
 
     let mut calendar_trie = CalendarTrie::new();
     cx.props.calendar_blocks.get().iter().for_each(|block| {
-        let block = (*block).clone();
+        let block = block.clone();
         let _ = calendar_trie.add(block, None);
     });
 
