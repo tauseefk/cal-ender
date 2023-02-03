@@ -20,14 +20,14 @@ pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
     let dragged_block = use_state(&cx, || None::<FlattenedCalendarBlock>);
     let use_g_stacking_algorithm = use_state(&cx, || true);
 
-    let mut calendar_trie = CalendarTrie::new();
+    let mut calendar_tree = CalendarBlockTree::new();
     cx.props.calendar_blocks.get().iter().for_each(|block| {
         let block = block.clone();
-        let _ = calendar_trie.add(block, None);
+        let _ = calendar_tree.add(block, None);
     });
 
-    calendar_trie.display();
-    let flattened_blocks = calendar_trie.traverse();
+    calendar_tree.display();
+    let flattened_blocks = calendar_tree.traverse();
     let handle_ghost_block_drag = move |evt: MouseEvent| {
         if dragged_block.get().is_some() {
             let position_y = evt.client_y as f64;

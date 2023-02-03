@@ -21,7 +21,7 @@ mod prelude {
     pub use uuid::Uuid;
 
     pub use crate::algo::calendar_block::*;
-    pub use crate::algo::calendar_trie::*;
+    pub use crate::algo::calendar_tree::*;
     pub use crate::components::{calendar, calendar_block, empty_element};
     pub use crate::get_position_offsets::*;
 
