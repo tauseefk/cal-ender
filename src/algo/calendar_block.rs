@@ -14,7 +14,7 @@ impl Display for CalendarBlockType {
             CalendarBlockType::Busy => "Busy",
             CalendarBlockType::Available => "Available",
         };
-        write!(f, "{}", block_type)
+        write!(f, "{block_type}")
     }
 }
 
