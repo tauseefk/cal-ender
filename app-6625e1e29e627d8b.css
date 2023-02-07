@@ -96,15 +96,19 @@ body {
 .ghost {
   box-shadow: 9px 9px 0 0 var(--color-grayscale-2);
 
-  /* border-image-slice: 0 30 30 0 !important; */
-  /* border-image-width: 8px 8px 8px 8px !important; */
-  /* border-image-outset: 0 8px 8px 0 !important; */
-  /* border-image-repeat: repeat repeat !important; */
-  /* border-image-source: url(./tooltip-border-dark.png) !important; */
-  /* border-style: solid !important;  */
+  
 }
 
-.ghost:after {
+.ghost-alt {
+  border-image-slice: 0 30 30 0 !important;
+  border-image-width: 8px 8px 8px 8px !important;
+  border-image-outset: 0 8px 8px 0 !important;
+  border-image-repeat: repeat repeat !important;
+  border-image-source: url(./tooltip-border-dark.png) !important;
+  border-style: solid !important;
+}
+
+.ghost-alt:after {
   content: " ";
   position: absolute;
   border: 1px solid var(--color-grayscale-2);
