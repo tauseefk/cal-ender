@@ -1,8 +1,8 @@
 use crate::prelude::*;
 
 #[derive(Props)]
-pub struct CalendarProps<'cal> {
-    calendar_blocks: &'cal UseState<Vec<CalendarBlock>>,
+pub struct CalendarProps<'app> {
+    calendar_blocks: &'app UseState<Vec<CalendarBlock>>,
 }
 
 fn get_time_from_minutes(minutes: u32) -> String {
@@ -14,7 +14,7 @@ fn get_time_from_minutes(minutes: u32) -> String {
 }
 
 #[allow(non_snake_case)]
-pub fn Calendar<'cal>(cx: Scope<'cal, CalendarProps<'cal>>) -> Element {
+pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
     let ghost_block_top = use_state(&cx, || 0_f64);
     let click_offset = use_state(&cx, || 0_f64);
     let dragged_block = use_state(&cx, || None::<FlattenedCalendarBlock>);

@@ -28,10 +28,10 @@ impl CalendarBlockTree {
         id_to_block_map.insert(root_node.id, root_node.clone());
 
         let mut adjacency_map = Graph::new();
-        let root = adjacency_map.add_node(root_node.id);
+        let root_idx = adjacency_map.add_node(root_node.id);
 
         Self {
-            root_idx: root,
+            root_idx,
             adjacency: adjacency_map,
             id_to_block_map,
         }
