@@ -28,10 +28,10 @@ pub fn get_g_transforms(stack_position: usize, subtree_depth: usize) -> (String,
                 false => 1.0 / width_divisor,
             };
 
-            return (
+            (
                 format!("calc(100% * {})", (stack_position - 1.0) / width_divisor),
                 format!("calc(100% * {width})"),
-            );
+            )
         }
     }
 }
