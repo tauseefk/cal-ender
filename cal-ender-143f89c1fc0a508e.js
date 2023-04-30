@@ -1040,7 +1040,7 @@ function initSync(module) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('cal-ender-7f9f257d3d3579d6_bg.wasm', import.meta.url);
+        input = new URL('cal-ender-143f89c1fc0a508e_bg.wasm', import.meta.url);
     }
     const imports = getImports();
 
