@@ -1,6 +1,5 @@
 # cal-endar
-I wrote a little bit about how unintuitive some calendar event stacking implementations can be, and how the better ones could potentially work.
-https://www.afloat.boats/posts/calendar-tetris-pt-1/
+I wrote a little bit about how unintuitive some calendar event stacking implementations can be, and how the better ones could potentially work [here.](https://tauseefk.github.io/posts/calendar-tetris-pt-1)
 
 Stack overlapping calendar events sanely
 
