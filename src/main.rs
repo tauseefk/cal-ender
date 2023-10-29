@@ -27,6 +27,7 @@ mod prelude {
 
     pub const MAX_COL_WIDTH: f64 = 500.0;
     pub const BLOCK_STACK_PADDING: f64 = 10.0;
+    pub const BLOCK_TOP_OFFSET: u32 = 200;
 }
 
 use prelude::*;
@@ -51,35 +52,59 @@ fn app(cx: Scope) -> Element {
         let mut calendar_blocks = vec![
             CalendarBlock {
                 id: Uuid::new_v4(),
-                start_minute: 750 - 420,
-                end_minute: 1050 - 420,
+                start_minute: 530 - BLOCK_TOP_OFFSET,
+                end_minute: 830 - BLOCK_TOP_OFFSET,
                 block_type: CalendarBlockType::Available,
                 subtree_depth: 0,
-                label: String::from("Rusted Development"),
+                label: String::from("Available"),
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
-                start_minute: 780 - 420,
-                end_minute: 915 - 420,
+                start_minute: 550 - BLOCK_TOP_OFFSET,
+                end_minute: 590 - BLOCK_TOP_OFFSET,
+                block_type: CalendarBlockType::Busy,
+                subtree_depth: 0,
+                label: String::from("Shower"),
+            },
+            CalendarBlock {
+                id: Uuid::new_v4(),
+                start_minute: 550 - BLOCK_TOP_OFFSET,
+                end_minute: 580 - BLOCK_TOP_OFFSET,
+                block_type: CalendarBlockType::Busy,
+                subtree_depth: 0,
+                label: String::from("Shower Thoughts"),
+            },
+            CalendarBlock {
+                id: Uuid::new_v4(),
+                start_minute: 605 - BLOCK_TOP_OFFSET,
+                end_minute: 665 - BLOCK_TOP_OFFSET,
                 block_type: CalendarBlockType::Busy,
                 subtree_depth: 0,
                 label: String::from("Coffee"),
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
-                start_minute: 780 - 420,
-                end_minute: 825 - 420,
+                start_minute: 605 - BLOCK_TOP_OFFSET,
+                end_minute: 630 - BLOCK_TOP_OFFSET,
                 block_type: CalendarBlockType::Busy,
                 subtree_depth: 0,
-                label: String::from("Dishes"),
+                label: String::from("Brew"),
             },
             CalendarBlock {
                 id: Uuid::new_v4(),
-                start_minute: 780 - 420,
-                end_minute: 900 - 420,
+                start_minute: 635 - BLOCK_TOP_OFFSET,
+                end_minute: 710 - BLOCK_TOP_OFFSET,
                 block_type: CalendarBlockType::Busy,
                 subtree_depth: 0,
-                label: String::from("Shower"),
+                label: String::from("Contemplation"),
+            },
+            CalendarBlock {
+                id: Uuid::new_v4(),
+                start_minute: 650 - BLOCK_TOP_OFFSET,
+                end_minute: 830 - BLOCK_TOP_OFFSET,
+                block_type: CalendarBlockType::Busy,
+                subtree_depth: 0,
+                label: String::from("Code"),
             },
         ];
 

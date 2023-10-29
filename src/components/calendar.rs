@@ -103,6 +103,7 @@ pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
         }
         None => rsx!(empty_element::EmptyElement {}),
     };
+
     return cx.render(rsx! {
         button {
             class: "btn",
