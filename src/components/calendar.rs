@@ -18,7 +18,7 @@ pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
     let ghost_block_top = use_state(&cx, || 0_f64);
     let click_offset = use_state(&cx, || 0_f64);
     let dragged_block = use_state(&cx, || None::<FlattenedCalendarBlock>);
-    let use_g_stacking_algorithm = use_state(&cx, || true);
+    let use_subtree_depth_algorithm = use_state(&cx, || true);
 
     let mut calendar_tree = CalendarBlockTree::new();
     cx.props.calendar_blocks.get().iter().for_each(|block| {
@@ -107,7 +107,7 @@ pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
         button {
             class: "btn",
             onclick: move |_| {
-                use_g_stacking_algorithm.set(!use_g_stacking_algorithm.get());
+                use_subtree_depth_algorithm.set(!use_subtree_depth_algorithm.get());
             },
             "Switch Stacking Algorithm"
         }
@@ -127,8 +127,8 @@ pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
                             false => 100,
                         };
 
-                        let (left, width) = match use_g_stacking_algorithm.get() {
-                            true => get_g_transforms(flattened_block.stack_position, flattened_block.block.subtree_depth),
+                        let (left, width) = match use_subtree_depth_algorithm.get() {
+                            true => get_subtree_depth_transforms(flattened_block.stack_position, flattened_block.block.subtree_depth),
                             false => get_position_offsets(flattened_block.stack_position)
                         };
                         let top = format!("{}px", flattened_block.block.start_minute);

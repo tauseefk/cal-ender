@@ -14,7 +14,10 @@ pub fn get_position_offsets(stack_position: usize) -> (String, String) {
     }
 }
 
-pub fn get_g_transforms(stack_position: usize, subtree_depth: usize) -> (String, String) {
+pub fn get_subtree_depth_transforms(
+    stack_position: usize,
+    subtree_depth: usize,
+) -> (String, String) {
     let stack_position = stack_position as f64;
     let subtree_depth = subtree_depth as f64;
 
