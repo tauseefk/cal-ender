@@ -129,7 +129,7 @@ pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
                         };
 
                         let (left, width) = match use_subtree_depth_algorithm.get() {
-                            true => get_subtree_depth_transforms(flattened_block.stack_position, flattened_block.block.subtree_depth),
+                            true => get_subtree_depth_transforms(flattened_block.stack_position, flattened_block.block.subtree_depth, flattened_block.subtree_height),
                             false => get_position_offsets(flattened_block.stack_position)
                         };
                         let top = format!("{}px", flattened_block.block.start_minute);
