@@ -45,18 +45,6 @@ impl CalendarBlockTree {
         block: CalendarBlock,
         destination: Option<NodeIndex>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        // Recursive Add
-        // 1. find overlaps
-        //      if no overlap
-        //          add edge from destination to new block
-        //          return
-        //      else if new block gets swallowed
-        //          call add with new destination
-        // TODO:else
-        //          add edge from destination to new block
-        //          add edges from new block to overlapping blocks
-        //          remove edges from destination to overlapping blocks
-
         let destination = destination.unwrap_or(self.root_idx);
 
         let mut forward_neighbors = self
