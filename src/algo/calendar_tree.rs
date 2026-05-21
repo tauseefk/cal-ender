@@ -3,9 +3,9 @@ use crate::prelude::*;
 #[derive(Debug, Clone)]
 pub struct FlattenedCalendarBlock {
     pub block: CalendarBlock,
-    /// The block's distance from the root in the flattened tree
+    /// The block's distance from the root
     pub stack_position: usize,
-    /// The block's cluster height
+    /// Height of the block's cluster (deepest leaf node to subtree parent)
     pub cluster_height: usize,
 }
 
