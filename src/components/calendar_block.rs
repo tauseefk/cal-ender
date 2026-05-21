@@ -18,7 +18,7 @@ pub struct CalendarBlockListItemProps<'block> {
 #[allow(non_snake_case)]
 pub fn CalendarBlockListItem<'block>(
     cx: Scope<'block, CalendarBlockListItemProps<'block>>,
-) -> Element {
+) -> Element<'block> {
     let block_type_class = match cx.props.block_type {
         CalendarBlockType::Wrapper => "wrapper",
         CalendarBlockType::Busy => "busy",
@@ -29,7 +29,7 @@ pub fn CalendarBlockListItem<'block>(
         None => "".to_string(),
     };
 
-    return cx.render(rsx!(div {
+    cx.render(rsx!(div {
         class: "absolute calendar-block {block_type_class} {classes}",
         title: "{cx.props.label}",
         top: "{cx.props.top}",
@@ -49,5 +49,5 @@ pub fn CalendarBlockListItem<'block>(
             }
         },
         "{cx.props.label}"
-    }));
+    }))
 }

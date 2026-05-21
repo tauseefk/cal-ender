@@ -3,7 +3,10 @@ use crate::prelude::*;
 #[derive(Debug, Clone)]
 pub struct FlattenedCalendarBlock {
     pub block: CalendarBlock,
+    /// The block's distance from the root
     pub stack_position: usize,
+    /// Height of the block's cluster (deepest leaf node to subtree parent)
+    pub cluster_height: usize,
 }
 
 pub struct CalendarBlockTree {
@@ -42,18 +45,6 @@ impl CalendarBlockTree {
         block: CalendarBlock,
         destination: Option<NodeIndex>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        // Recursive Add
-        // 1. find overlaps
-        //      if no overlap
-        //          add edge from destination to new block
-        //          return
-        //      else if new block gets swallowed
-        //          call add with new destination
-        // TODO:else
-        //          add edge from destination to new block
-        //          add edges from new block to overlapping blocks
-        //          remove edges from destination to overlapping blocks
-
         let destination = destination.unwrap_or(self.root_idx);
 
         let mut forward_neighbors = self
@@ -112,17 +103,17 @@ impl CalendarBlockTree {
     }
 
     pub fn traverse(&self) -> Vec<FlattenedCalendarBlock> {
-        let mut traversal_queue: VecDeque<(NodeIndex, usize)> =
+        let mut traversal_queue: VecDeque<(NodeIndex, usize, usize)> =
             VecDeque::with_capacity(self.id_to_block_map.iter().len());
 
-        let mut buffer: Vec<(NodeIndex, usize)> =
+        let mut buffer: Vec<(NodeIndex, usize, usize)> =
             Vec::with_capacity(self.id_to_block_map.iter().len());
 
-        traversal_queue.push_back((self.root_idx, 0));
+        traversal_queue.push_back((self.root_idx, 0, 0));
 
         while !traversal_queue.is_empty() {
-            let (node_idx, stack_position) = traversal_queue.pop_front().unwrap();
-            buffer.push((node_idx, stack_position));
+            let (node_idx, stack_position, cluster_height) = traversal_queue.pop_front().unwrap();
+            buffer.push((node_idx, stack_position, cluster_height));
 
             let forward_neighbors = self
                 .adjacency
@@ -130,18 +121,25 @@ impl CalendarBlockTree {
                 .map(|e| e.target());
 
             forward_neighbors.for_each(|n| {
-                traversal_queue.push_back((n, stack_position + 1));
+                let child_cluster_height = if stack_position == 0 {
+                    let block_id = self.adjacency[n];
+                    1 + self.id_to_block_map.get(&block_id).unwrap().subtree_depth
+                } else {
+                    cluster_height
+                };
+                traversal_queue.push_back((n, stack_position + 1, child_cluster_height));
             });
         }
 
         buffer
             .iter()
-            .map(|(node_idx, stack_position)| {
+            .map(|(node_idx, stack_position, cluster_height)| {
                 let current_block_id = self.adjacency[*node_idx];
                 let current_block = self.id_to_block_map.get(&current_block_id).unwrap();
                 FlattenedCalendarBlock {
                     block: current_block.clone(),
                     stack_position: *stack_position,
+                    cluster_height: *cluster_height,
                 }
             })
             .collect()

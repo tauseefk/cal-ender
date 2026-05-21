@@ -14,27 +14,29 @@ pub fn get_position_offsets(stack_position: usize) -> (String, String) {
     }
 }
 
+/// Returns the CSS `transform` offsets for a block.
+///
+/// The block's left edge as a fraction of the container
+/// left_fraction: f64,
+/// One column's width as a fraction of the container
+/// column_fraction: f64,
+/// Whether the block is a leaf (i.e., spans the full container width)
+/// is_leaf: bool,
+///
 pub fn get_subtree_depth_transforms(
-    stack_position: usize,
-    subtree_depth: usize,
+    left_fraction: f64,
+    column_fraction: f64,
+    is_leaf: bool,
 ) -> (String, String) {
-    let stack_position = stack_position as f64;
-    let subtree_depth = subtree_depth as f64;
+    let width = match is_leaf {
+        // leaf: fill from its own left edge to the container's right edge
+        true => 1.0 - left_fraction,
+        // non-leaf: one column plus a half-column overlap into its child
+        false => 1.5 * column_fraction,
+    };
 
-    let width_divisor = stack_position + subtree_depth;
-
-    match stack_position < 1.0 {
-        true => (0.to_string(), MAX_COL_WIDTH.to_string()),
-        false => {
-            let width = match subtree_depth > 0.0 {
-                true => 1.8 / width_divisor,
-                false => 1.0 / width_divisor,
-            };
-
-            (
-                format!("calc(100% * {})", (stack_position - 1.0) / width_divisor),
-                format!("calc(100% * {width})"),
-            )
-        }
-    }
+    (
+        format!("calc(100% * {left_fraction})"),
+        format!("calc(100% * {width})"),
+    )
 }

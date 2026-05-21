@@ -14,7 +14,7 @@ fn get_time_from_minutes(minutes: u32) -> String {
 }
 
 #[allow(non_snake_case)]
-pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
+pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element<'app> {
     let ghost_block_top = use_state(&cx, || 0_f64);
     let click_offset = use_state(&cx, || 0_f64);
     let dragged_block = use_state(&cx, || None::<FlattenedCalendarBlock>);
@@ -104,7 +104,7 @@ pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
         None => rsx!(empty_element::EmptyElement {}),
     };
 
-    return cx.render(rsx! {
+    cx.render(rsx! {
         button {
             class: "btn",
             onclick: move |_| {
@@ -129,7 +129,14 @@ pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
                         };
 
                         let (left, width) = match use_subtree_depth_algorithm.get() {
-                            true => get_subtree_depth_transforms(flattened_block.stack_position, flattened_block.block.subtree_depth),
+                            true => {
+                                    let height = flattened_block.cluster_height as f64;
+                                    get_subtree_depth_transforms(
+                                        (flattened_block.stack_position as f64 - 1.0) / height,
+                                        1.0 / height,
+                                        flattened_block.block.subtree_depth == 0,
+                                    )
+                            },
                             false => get_position_offsets(flattened_block.stack_position)
                         };
                         let top = format!("{}px", flattened_block.block.start_minute);
@@ -142,7 +149,7 @@ pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
                         let id = flattened_block.block.id;
                         let block_type = flattened_block.block.block_type;
 
-                        return rsx!(calendar_block::CalendarBlockListItem {
+                        rsx!(calendar_block::CalendarBlockListItem {
                             key: "{id}",
                             left: left,
                             top: top,
@@ -157,11 +164,11 @@ pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
                                 click_offset.set(evt.client_y  as f64 - flattened_block.block.start_minute as f64);
                             },
                             onmouseup: handle_move_calendar_block,
-                        });
+                        })
                     }
                 )
                 rsx!(ghost_block)
             }
         }
-    });
+    })
 }
