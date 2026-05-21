@@ -129,17 +129,13 @@ pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
                         };
 
                         let (left, width) = match use_subtree_depth_algorithm.get() {
-                            true => match flattened_block.stack_position {
-                                // synthetic root spans the full container width
-                                0 => (0.to_string(), MAX_COL_WIDTH.to_string()),
-                                stack_position => {
+                            true => {
                                     let height = flattened_block.subtree_height as f64;
                                     get_subtree_depth_transforms(
-                                        (stack_position as f64 - 1.0) / height,
+                                        (flattened_block.stack_position as f64 - 1.0) / height,
                                         1.0 / height,
                                         flattened_block.block.subtree_depth == 0,
                                     )
-                                }
                             },
                             false => get_position_offsets(flattened_block.stack_position)
                         };
