@@ -130,7 +130,7 @@ pub fn Calendar<'app>(cx: Scope<'app, CalendarProps<'app>>) -> Element {
 
                         let (left, width) = match use_subtree_depth_algorithm.get() {
                             true => {
-                                    let height = flattened_block.subtree_height as f64;
+                                    let height = flattened_block.cluster_height as f64;
                                     get_subtree_depth_transforms(
                                         (flattened_block.stack_position as f64 - 1.0) / height,
                                         1.0 / height,

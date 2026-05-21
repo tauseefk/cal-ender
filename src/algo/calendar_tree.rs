@@ -6,7 +6,7 @@ pub struct FlattenedCalendarBlock {
     /// The block's distance from the root in the flattened tree
     pub stack_position: usize,
     /// The block's cluster height
-    pub subtree_height: usize,
+    pub cluster_height: usize,
 }
 
 pub struct CalendarBlockTree {
@@ -112,8 +112,8 @@ impl CalendarBlockTree {
         traversal_queue.push_back((self.root_idx, 0, 0));
 
         while !traversal_queue.is_empty() {
-            let (node_idx, stack_position, subtree_height) = traversal_queue.pop_front().unwrap();
-            buffer.push((node_idx, stack_position, subtree_height));
+            let (node_idx, stack_position, cluster_height) = traversal_queue.pop_front().unwrap();
+            buffer.push((node_idx, stack_position, cluster_height));
 
             let forward_neighbors = self
                 .adjacency
@@ -121,25 +121,25 @@ impl CalendarBlockTree {
                 .map(|e| e.target());
 
             forward_neighbors.for_each(|n| {
-                let child_subtree_height = if stack_position == 0 {
+                let child_cluster_height = if stack_position == 0 {
                     let block_id = self.adjacency[n];
                     1 + self.id_to_block_map.get(&block_id).unwrap().subtree_depth
                 } else {
-                    subtree_height
+                    cluster_height
                 };
-                traversal_queue.push_back((n, stack_position + 1, child_subtree_height));
+                traversal_queue.push_back((n, stack_position + 1, child_cluster_height));
             });
         }
 
         buffer
             .iter()
-            .map(|(node_idx, stack_position, subtree_height)| {
+            .map(|(node_idx, stack_position, cluster_height)| {
                 let current_block_id = self.adjacency[*node_idx];
                 let current_block = self.id_to_block_map.get(&current_block_id).unwrap();
                 FlattenedCalendarBlock {
                     block: current_block.clone(),
                     stack_position: *stack_position,
-                    subtree_height: *subtree_height,
+                    cluster_height: *cluster_height,
                 }
             })
             .collect()
